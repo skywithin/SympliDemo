@@ -26,7 +26,7 @@ namespace Ratings.Services
             IEnumerable<string> keyWords,
             int maxSearchResults = 100)
         {
-
+            //TODO: Implement Bing Scraper
             throw new NotImplementedException();
         }
     }

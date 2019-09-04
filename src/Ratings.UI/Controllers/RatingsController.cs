@@ -47,7 +47,8 @@ namespace Ratings.UI.Controllers
                 model.SearchItem,
                 searchEngineType,
                 model.MaxSearchResults);
-
+            
+            //TODO: Implement proper cache manager
             HttpContext.Cache.Insert(
                 model.GetCacheItemKey(), 
                 output, 
