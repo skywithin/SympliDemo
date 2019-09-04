@@ -48,11 +48,11 @@ namespace Ratings.Services.Tests
             // ASSERT:
             // Scraper can generate correct list of urls required to run a search
 
-            var gss = new GoogleSearchScraper(downloadService: null);
+            var SUT = new GoogleSearchScraper(downloadService: null);
             var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
             var maxSearchResults = 100;
 
-            var requestUrls = gss.GetSearchRequestUrls(keyWords, maxSearchResults).ToList();
+            var requestUrls = SUT.GetSearchRequestUrls(keyWords, maxSearchResults).ToList();
 
             Assert.NotNull(requestUrls);
             Assert.True(requestUrls.Count == 10);
@@ -72,12 +72,12 @@ namespace Ratings.Services.Tests
                 .DownloadWebsitesParallelAsync(urls: Arg.Any<IEnumerable<string>>())
                 .Returns(new List<string> { testHtml, testHtml, testHtml });
 
-            var gss = new GoogleSearchScraper(downloadService: _downloadService);
+            var SUT = new GoogleSearchScraper(downloadService: _downloadService);
             var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
             var maxSearchResults = 100;
             var expectedSubstring = "www.sympli.com.au";
 
-            var searchResults = await gss.Search(keyWords, maxSearchResults) as List<string>;
+            var searchResults = await SUT.Search(keyWords, maxSearchResults) as List<string>;
 
             Assert.NotNull(searchResults);
             Assert.True(searchResults.Any(r => r.Contains(expectedSubstring)));
@@ -93,11 +93,11 @@ namespace Ratings.Services.Tests
                 .DownloadWebsitesParallelAsync(urls: Arg.Any<IEnumerable<string>>())
                 .Returns(new List<string> { notFoundTestHtml });
 
-            var gss = new GoogleSearchScraper(downloadService: _downloadService);
+            var SUT = new GoogleSearchScraper(downloadService: _downloadService);
             var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
             var maxSearchResults = 100;
 
-            var searchResults = await gss.Search(keyWords, maxSearchResults) as List<string>;
+            var searchResults = await SUT.Search(keyWords, maxSearchResults) as List<string>;
 
             Assert.NotNull(searchResults);
             Assert.False(searchResults.Any());
@@ -106,8 +106,8 @@ namespace Ratings.Services.Tests
         [Fact]
         public void GoogleSearchScraper_CanParsePageContent()
         {
-            var gss = new GoogleSearchScraper(downloadService: null);
-            var parsedItems = gss.GetAllSearchResultItems(new string[] { testHtml }).ToList();
+            var SUT = new GoogleSearchScraper(downloadService: null);
+            var parsedItems = SUT.GetAllSearchResultItems(new string[] { testHtml }).ToList();
 
             Assert.NotNull(parsedItems);
             Assert.True(parsedItems.Count == 4);
@@ -116,8 +116,8 @@ namespace Ratings.Services.Tests
         [Fact]
         public void GoogleSearchScraper_CanParseMultiplePages()
         {
-            var gss = new GoogleSearchScraper(downloadService: null);
-            var parsedItems = gss.GetAllSearchResultItems(new string[] { testHtml, testHtml }).ToList();
+            var SUT = new GoogleSearchScraper(downloadService: null);
+            var parsedItems = SUT.GetAllSearchResultItems(new string[] { testHtml, testHtml }).ToList();
 
             Assert.NotNull(parsedItems);
             Assert.True(parsedItems.Count == 8);

@@ -8,27 +8,30 @@ namespace Ratings.Services
 {
     public class RatingService : IRatingService
     {
-        ISearchScraper _searchScraper;
+        ISearchScraperFactory _searchScraperFactory;
 
 
-        public RatingService(ISearchScraper searchScraper)
+        public RatingService(ISearchScraperFactory searchScraperFactory)
         {
-            _searchScraper = searchScraper;
+            _searchScraperFactory = searchScraperFactory;
         }
 
         /// <summary>
-        /// Find all positions of a search item 
+        /// Find all positions of a search item
         /// </summary>
         /// <param name="keyWords"></param>
         /// <param name="searchItem"></param>
+        /// <param name="type"></param>
         /// <param name="maxSearchResults"></param>
         /// <returns></returns>
         public async Task<IEnumerable<int>> GetRatings(
             IEnumerable<string> keyWords,
             string searchItem,
+            SearchEngineType type,
             int maxSearchResults = 100)
         {
-            var searchResultItems = await _searchScraper.Search(keyWords, maxSearchResults);
+            var searchScraper = _searchScraperFactory.GetSearchScraperInstance(type);
+            var searchResultItems = await searchScraper.Search(keyWords, maxSearchResults);
             return GetSearchItemPositions(searchResultItems, searchItem);
         }
 

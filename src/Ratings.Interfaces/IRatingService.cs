@@ -9,6 +9,7 @@ namespace Ratings.Interfaces
         Task<IEnumerable<int>> GetRatings(
             IEnumerable<string> keyWords,
             string searchItem,
+            SearchEngineType type,
             int maxSearchResults = 100);
     }
 }

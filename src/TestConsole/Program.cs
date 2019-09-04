@@ -15,15 +15,19 @@ namespace TestConsole
             try
             {
                 IDownloadService ds = new DownloadService();
-                ISearchScraper ss = new GoogleSearchScraper(ds);
-                IRatingService rs = new RatingService(ss);
-
+                ISearchScraperFactory ssf = new SearchScraperFactory(ds);
+                IRatingService rs = new RatingService(ssf);
 
                 var keyWords = new string[] { "e-settlements" };
                 var searchItem = "www.sympli.com.au";
+                var searchEngineType = SearchEngineType.Google;
                 var maxSearchResults = 30;
 
-                var result = Task.Run(() => rs.GetRatings(keyWords, searchItem, maxSearchResults)).Result;
+                var result = Task.Run(() => rs.GetRatings(
+                    keyWords, 
+                    searchItem, 
+                    searchEngineType, 
+                    maxSearchResults)).Result;
 
                 foreach(var item in result)
                 {
