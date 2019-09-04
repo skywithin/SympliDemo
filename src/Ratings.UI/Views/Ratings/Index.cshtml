@@ -1,0 +1,38 @@
+﻿@model IEnumerable<int>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Enter your search criteria</h2>
+
+@using (Html.BeginForm("Index", "Ratings", FormMethod.Post))
+{
+    <label for="keyWord">Key Word</label>
+    <input type="text" id="keyWord" name="keyWord" value="e-settlements" />
+
+    <label for="searchItem">Search Item</label>
+    <input type="text" id="searchItem" name="searchItem" value="sympli" />
+
+    <label for="maxSearchResults">Max Search Results</label>
+    <input type="number" id="maxSearchResults" name="maxSearchResults" value="100" />
+
+    <label>Search Engine</label>
+    <select id="searchEngine" name="searchEngine">
+        <option value="Google">Google</option>
+    </select>
+
+    <input type="submit" value="Submit"/>
+}
+
+@if (Model != null && Model.Any())
+{
+    <h2>The ranking for your search is:</h2>
+    <ul>
+        @foreach (var item in Model)
+        {
+            <li>@item</li>
+        }
+    </ul>
+}
+
+
