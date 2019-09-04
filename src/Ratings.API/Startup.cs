@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ratings.Interfaces;
+using Ratings.Services;
 
 namespace Ratings.API
 {
@@ -26,6 +28,11 @@ namespace Ratings.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // Dependency Injection
+            services.AddScoped<IDownloadService, DownloadService>();
+            services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<ISearchScraperFactory, SearchScraperFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

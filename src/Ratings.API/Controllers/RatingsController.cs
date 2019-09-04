@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Ratings.Interfaces;
 
 namespace Ratings.API.Controllers
 {
@@ -10,19 +11,41 @@ namespace Ratings.API.Controllers
     [ApiController]
     public class RatingsController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<int>> GeRatings()
+        private IRatingService _ratingService;
+
+        public RatingsController(IRatingService ratingService)
         {
-            return Ok(new int[] { 1, 2, 3 });
+            _ratingService = ratingService;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> GetValue(int id)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<int>>> GetRatings(
+            [FromQuery] string[] keyWords,
+            [FromQuery] string searchItem,
+            [FromQuery] string searchEngine,
+            [FromQuery] int maxSearchResults = 100)
         {
-            var value = string.Format($"Your value is {id}");
-            return Ok(value);
+            var searchEngineType = Enum.Parse<SearchEngineType>(
+                searchEngine, 
+                ignoreCase: true);
+
+            var output = await _ratingService.GetRatings(
+                keyWords,
+                searchItem,
+                searchEngineType,
+                maxSearchResults);
+
+            return Ok(output);
         }
+
+
+        //[HttpGet]
+        //public ActionResult<IEnumerable<string>> Index()
+        //{
+        //    var output = new List<string>();
+        //    output.Add(string.Format($"Now: {DateTime.Now.ToLongTimeString()}"));
+        //    output.Add("Try this URL: http://localhost:5000/api/ratings?keywords=e-settlements&searchItem=www.sympli.com.au&searchEngine=Google&maxSearchResults=100");
+        //    return Ok(output);
+        //}
     }
 }
