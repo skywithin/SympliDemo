@@ -1,12 +1,18 @@
-﻿using System;
+﻿using NSubstitute;
+using Ratings.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Ratings.Services.Tests
 {
     public class GoogleSearchScraperTests
     {
-        string testHtml =
+        private readonly IDownloadService _downloadService = Substitute.For<IDownloadService>();
+
+        private readonly string testHtml =
             "<!doctype html>" +
             "  <div id=\"search\">" +
             "    <div class=\"bkWMgd\">" +
@@ -30,7 +36,7 @@ namespace Ratings.Services.Tests
             "  </div>" +
             "</html>";
 
-        string notFoundTestHtml =
+        private readonly string notFoundTestHtml =
             "<!doctype html>" +
             "  <div class=\"mnr-c\"><div class=\"med card-section\"><p>Your search - <em>vcfgvjvhkgdr</em> - did not match any documents.</p></div></div>" +
             "  <div id=\"search\"></div>" +
@@ -40,7 +46,7 @@ namespace Ratings.Services.Tests
         public void GoogleSearchScraper_CanGenerateSearchUrls()
         {
             // ASSERT:
-            // Can generate correct list of urls required to run a search
+            // Scraper can generate correct list of urls required to run a search
 
             var gss = new GoogleSearchScraper(downloadService: null);
             var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
@@ -52,6 +58,49 @@ namespace Ratings.Services.Tests
             Assert.True(requestUrls.Count == 10);
             Assert.True(requestUrls[0] == "https://www.google.com.au/search?q=KEYWORD1+KEYWORD2&start=0");
             Assert.True(requestUrls[1] == "https://www.google.com.au/search?q=KEYWORD1+KEYWORD2&start=10");
+            Assert.True(requestUrls[9] == "https://www.google.com.au/search?q=KEYWORD1+KEYWORD2&start=90");
+        }
+
+        [Fact]
+        public async Task GoogleSearchScraper_Search_ReturnsValidSearchResults()
+        {
+            // ASSERT:
+            // Scraper is able to process multiple search downloads.
+            // One of the results contains expected substring.
+
+            _downloadService
+                .DownloadWebsitesParallelAsync(urls: Arg.Any<IEnumerable<string>>())
+                .Returns(new List<string> { testHtml, testHtml, testHtml });
+
+            var gss = new GoogleSearchScraper(downloadService: _downloadService);
+            var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
+            var maxSearchResults = 100;
+            var expectedSubstring = "www.sympli.com.au";
+
+            var searchResults = await gss.Search(keyWords, maxSearchResults) as List<string>;
+
+            Assert.NotNull(searchResults);
+            Assert.True(searchResults.Any(r => r.Contains(expectedSubstring)));
+        }
+
+        [Fact]
+        public async Task GoogleSearchScraper_BadSearch_ReturnsEmptyList()
+        {
+            // ASSERT:
+            // Scraper is able to handle responses with no search results.
+
+            _downloadService
+                .DownloadWebsitesParallelAsync(urls: Arg.Any<IEnumerable<string>>())
+                .Returns(new List<string> { notFoundTestHtml });
+
+            var gss = new GoogleSearchScraper(downloadService: _downloadService);
+            var keyWords = new string[] { "KEYWORD1", "KEYWORD2" };
+            var maxSearchResults = 100;
+
+            var searchResults = await gss.Search(keyWords, maxSearchResults) as List<string>;
+
+            Assert.NotNull(searchResults);
+            Assert.False(searchResults.Any());
         }
 
         [Fact]
