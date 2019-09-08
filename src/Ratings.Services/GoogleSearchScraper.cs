@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Ratings.Services
 {
-    public class GoogleSearchScraper : ISearchScraper
+    public class GoogleSearchScraper : BaseSearchScraper
     {
         private const int SearchResultsPerPage = 10;
         private const string GoogleResultsParserRegex = "<div\\sclass=\\\"r\\\">(.*?)</div>";
@@ -24,7 +24,7 @@ namespace Ratings.Services
         /// <param name="keyWords">List of key words</param>
         /// <param name="maxSearchResults">Total number of search results to get</param>
         /// <returns>Pieces of html representing search results</returns>
-        public async Task<IEnumerable<string>> Search(
+        public override async Task<IEnumerable<string>> Search(
             IEnumerable<string> keyWords,
             int maxSearchResults = 100)
         {
@@ -46,7 +46,7 @@ namespace Ratings.Services
             int maxSearchResults = 100)
         {
             var output = new List<string>();
-            var numberOfSearchRequests = GetNumberOfSearchRequests(maxSearchResults);
+            var numberOfSearchRequests = GetNumberOfSearchRequests(SearchResultsPerPage, maxSearchResults);
             var keyPhrase = GetSearchPhrase(keyWords);
 
             for (int requestIndex = 0; requestIndex < numberOfSearchRequests; requestIndex++)
@@ -56,45 +56,6 @@ namespace Ratings.Services
             }
 
             return output;
-        }
-
-        /// <summary>
-        /// Calculate number of requests required to get required number of search results
-        /// </summary>
-        /// <param name="maxSearchResults"></param>
-        /// <returns>Number of required searches. Minimum of 1 request is required</returns>
-        private int GetNumberOfSearchRequests(int maxSearchResults)
-        {
-            var numberOfSearchRequests = maxSearchResults / SearchResultsPerPage;
-
-            // Make sure there is at least one request
-            numberOfSearchRequests = numberOfSearchRequests > 0 ? numberOfSearchRequests : 1;
-
-            return numberOfSearchRequests;
-        }
-
-        /// <summary>
-        /// Assemble search phrase from key words. All words must be separated by '+' char
-        /// </summary>
-        /// <param name="keyWords"></param>
-        /// <returns></returns>
-        private string GetSearchPhrase(IEnumerable<string> keyWords)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var keyWord in keyWords)
-            {
-                sb.Append(keyWord);
-                sb.Append("+");
-            }
-
-            if (sb.Length > 0)
-            {
-                // Remove trailing "+"
-                sb.Remove(sb.Length - 1, 1);
-            }
-
-            return sb.ToString();
         }
 
         public IEnumerable<string> GetAllSearchResultItems(IEnumerable<string> websitesHtmlContent)

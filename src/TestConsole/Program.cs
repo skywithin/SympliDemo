@@ -20,7 +20,8 @@ namespace TestConsole
 
                 var keyWords = new string[] { "e-settlements" };
                 var searchItem = "www.sympli.com.au";
-                var searchEngineType = SearchEngineType.Google;
+                //var searchEngineType = SearchEngineType.Google;
+                var searchEngineType = SearchEngineType.Bing;
                 var maxSearchResults = 30;
 
                 var result = Task.Run(() => rs.GetRatings(
