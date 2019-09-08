@@ -13,5 +13,5 @@
 * User input validation needs to be implemented both on Ratings.UI and Ratings.API.
 
 * Examples of API requests running locally: 
-** http://localhost:5000/api/ratings?keywords=e-settlements&searchItem=www.sympli.com.au&searchEngine=Google&maxSearchResults=100
-** http://localhost:5000/api/ratings?keywords=e-settlements&searchItem=www.sympli.com.au&searchEngine=Bing&maxSearchResults=100
+  * http://localhost:5000/api/ratings?keywords=e-settlements&searchItem=www.sympli.com.au&searchEngine=Google&maxSearchResults=100
+  * http://localhost:5000/api/ratings?keywords=e-settlements&searchItem=www.sympli.com.au&searchEngine=Bing&maxSearchResults=100
